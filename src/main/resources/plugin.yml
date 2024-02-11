@@ -1,0 +1,8 @@
+name: CustomBlocks
+version: '${project.version}'
+main: me.johannesk.customblocks.Main
+api-version: '1.20'
+commands:
+  customblock:
+    description: Gives player custom block
+    usage: /customblock <down> <east> <north> <south> <up> <west>
