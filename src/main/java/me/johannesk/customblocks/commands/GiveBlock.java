@@ -17,12 +17,7 @@ import java.util.*;
 public class GiveBlock implements CommandExecutor {
 
     private static final String ERROR_PREFIX = ChatColor.RED + "CustomBlocks> " + ChatColor.YELLOW;
-    private static final Set<Material> ALLOWED_MATERIALS = new HashSet<>();
-    public GiveBlock(){
-        ALLOWED_MATERIALS.add(Material.RED_MUSHROOM_BLOCK);
-        ALLOWED_MATERIALS.add(Material.BROWN_MUSHROOM_BLOCK);
-        ALLOWED_MATERIALS.add(Material.MUSHROOM_STEM);
-    }
+
     @Override
     public boolean onCommand(@NotNull CommandSender sender, @NotNull Command cmd, @NotNull String label, @NotNull String[] args) {
 
@@ -30,18 +25,16 @@ public class GiveBlock implements CommandExecutor {
             Player player = (Player)  sender;
             if (player.hasPermission("customblocks.*")) {
                 if (args.length == 6) {
-                        ItemStack item = player.getInventory().getItemInMainHand().clone();
-                        if (ALLOWED_MATERIALS.contains(item.getType())) {
+                        ItemStack item = player.getInventory().getItemInMainHand();
+                        if (CustomBlock.isCustomBlockType(item.getType())) {
                             //Creates new custom block to store provided values
-                            CustomBlock block = new CustomBlock(args);
-                            ItemMeta meta = item.getItemMeta();
-                            //Easier for user to see what type of block it is by setting display name
-                            // equal to arguments. The display name is NOT used to check if it is a valid custom block.
-                            meta.setDisplayName(args.toString());
-                            item.setItemMeta(meta);
-                            player.getInventory().addItem(item);
-                            //Adds cstom block to the block manager
-                            BlockManager.addBlockItem(item, block);
+                            //Creates PDE for item as well.
+                            CustomBlock customBlock = new CustomBlock(args, item);
+                            //Retrieve item with modified PDE
+                            ItemStack customBlockItem = customBlock.getBlockItem();
+                            player.getInventory().addItem(customBlockItem);
+                            //Adds custom block to the block manager.
+                            BlockManager.addBlockItem(customBlockItem, customBlock);
                         } else
                             player.sendMessage(ERROR_PREFIX + "Invalid material! Can only use red, brown and stem mushroom blocks!");
                   } else {
